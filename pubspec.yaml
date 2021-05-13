@@ -1,4 +1,4 @@
-name: androidesp32btrecordingapp
+name: pebble
 description: A new Flutter application.
 
 # The following line prevents the package from being accidentally published to
@@ -27,12 +27,12 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.3
+  cupertino_icons: ^1.0.3
   flutter_bluetooth_serial: ^0.2.2
-  path_provider: ^1.6.9
-  intl: ^0.16.1
+  path_provider: ^2.0.1
+  intl: ^0.17.0
   slide_popup_dialog: ^0.0.2
-  flutter_svprogresshud: ^0.0.3
+  flutter_svprogresshud: ^0.0.7
   fileaudioplayer: ^1.0.0
 
 dev_dependencies:

@@ -1,5 +1,5 @@
-import 'package:androidesp32btrecordingapp/BluetoothDeviceListEntry.dart';
-import 'package:androidesp32btrecordingapp/detailpage.dart';
+import 'package:pebble/BluetoothDeviceListEntry.dart';
+import 'package:pebble/detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
@@ -25,7 +25,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   BluetoothState _bluetoothState = BluetoothState.UNKNOWN;
 
-  List<BluetoothDevice> devices = List<BluetoothDevice>();
+  List<BluetoothDevice> devices = [];
 
   @override
   void initState() {
@@ -89,7 +89,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("ESP32 Voice Recorder"),
+        title: Text("Pebble"),
       ),
       body: Container(
         child: Column(
@@ -97,23 +97,22 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             SwitchListTile(
               title: Text('Enable Bluetooth'),
               value: _bluetoothState.isEnabled,
-              onChanged: (bool value) {
-                future() async {
-                  if (value) {
-                    await FlutterBluetoothSerial.instance.requestEnable();
-                  } else {
-                    await FlutterBluetoothSerial.instance.requestDisable();
-                  }
-                  future().then((_) {
-                    setState(() {});
-                  });
+              onChanged: (bool value) async {
+                if (value) {
+                  await FlutterBluetoothSerial.instance.requestEnable();
+                } else {
+                  await FlutterBluetoothSerial.instance.requestDisable();
                 }
+                setState(() {});
               },
             ),
             ListTile(
               title: Text("Bluetooth STATUS"),
-              subtitle: Text(_bluetoothState.toString()),
-              trailing: RaisedButton(
+              subtitle: Text(_bluetoothState.toString(),
+              style: TextStyle(
+                fontSize: MediaQuery.of(context).size.width * 0.04
+              ),),
+              trailing: MaterialButton(
                 child: Text("Settings"),
                 onPressed: () {
                   FlutterBluetoothSerial.instance.openSettings();
@@ -124,11 +123,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               child: ListView(
                 children: devices
                     .map((_device) => BluetoothDeviceListEntry(
+                          context: context,
                           device: _device,
                           enabled: true,
                           onTap: () {
                             print("Item");
-                            _startCameraConnect(context, _device);
+                            _startCBluetoothConnect(context, _device);
                           },
                         ))
                     .toList(),
@@ -140,7 +140,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  void _startCameraConnect(BuildContext context, BluetoothDevice server) {
+  void _startCBluetoothConnect(BuildContext context, BluetoothDevice server) {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
       return DetailPage(server: server);
     }));

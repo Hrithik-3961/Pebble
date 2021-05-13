@@ -1,4 +1,4 @@
-package com.thatproject.androidesp32btrecordingapp;
+package com.innov8itTechnologies.pebble;
 
 import io.flutter.embedding.android.FlutterActivity;
 

@@ -8,7 +8,7 @@ class WavHeader {
   }
 
   static List<int> createWavHeader(int wavSize) {
-    List<int> _byte = List<int>();
+    List<int> _byte = [];
 
     var chunkIDBytes = toBytes('RIFF');
     var _chunkIDBytes = chunkIDBytes.buffer.asByteData();

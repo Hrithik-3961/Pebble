@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:androidesp32btrecordingapp/file_entity_list_tile.dart';
-import 'package:androidesp32btrecordingapp/wav_header.dart';
+import 'package:pebble/file_entity_list_tile.dart';
+import 'package:pebble/wav_header.dart';
 import 'package:async/async.dart';
 import 'package:fileaudioplayer/fileaudioplayer.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +39,7 @@ class _DetailPageState extends State<DetailPage> {
   RecordState _recordState = RecordState.stopped;
   DateFormat dateFormat = DateFormat("yyyy-MM-dd_HH_mm_ss");
 
-  List<FileSystemEntity> files = List<FileSystemEntity>();
+  List<FileSystemEntity> files = [];
   String selectedFilePath;
   FileAudioPlayer player = FileAudioPlayer();
 
@@ -48,7 +48,7 @@ class _DetailPageState extends State<DetailPage> {
     super.initState();
     _getBTConnection();
     _timer = new RestartableTimer(Duration(seconds: 1), _completeByte);
-    _listofFiles();
+    _listOfFiles();
     selectedFilePath = '';
   }
 
@@ -64,6 +64,8 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   _getBTConnection() {
+    print('MAC ADDRESS: ${widget.server.address}');
+
     BluetoothConnection.toAddress(widget.server.address).then((_connection) {
       connection = _connection;
       isConnecting = false;
@@ -81,6 +83,7 @@ class _DetailPageState extends State<DetailPage> {
         Navigator.of(context).pop();
       });
     }).catchError((error) {
+      print("myERROR: $error");
       Navigator.of(context).pop();
     });
   }
@@ -88,7 +91,6 @@ class _DetailPageState extends State<DetailPage> {
   _completeByte() async {
     if (chunks.length == 0 || contentLength == 0) return;
     SVProgressHUD.dismiss();
-    print("CompleteByte length : $contentLength");
     _bytes = Uint8List(contentLength);
     int offset = 0;
     for (final List<int> chunk in chunks) {
@@ -103,7 +105,7 @@ class _DetailPageState extends State<DetailPage> {
 
     print(await file.length());
 
-    _listofFiles();
+    _listOfFiles();
 
     contentLength = 0;
     chunks.clear();
@@ -115,8 +117,6 @@ class _DetailPageState extends State<DetailPage> {
       contentLength += data.length;
       _timer.reset();
     }
-
-    print("Data Length: ${data.length}, chunks: ${chunks.length}");
   }
 
   void _sendMessage(String text) async {
@@ -161,7 +161,6 @@ class _DetailPageState extends State<DetailPage> {
                                   filePath: _file.path,
                                   fileSize: _file.statSync().size,
                                   onLongPress: () async {
-                                    print("onLongPress item");
                                     if (await File(_file.path).exists()) {
                                       File(_file.path).deleteSync();
 
@@ -170,7 +169,6 @@ class _DetailPageState extends State<DetailPage> {
                                     }
                                   },
                                   onTap: () async {
-                                    print("onTap item");
                                     if (_file.path == selectedFilePath) {
                                       await player.stop();
                                       selectedFilePath = '';
@@ -207,7 +205,7 @@ class _DetailPageState extends State<DetailPage> {
   Widget shotButton() {
     return Container(
       padding: const EdgeInsets.all(16),
-      child: RaisedButton(
+      child: MaterialButton(
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
             side: BorderSide(color: Colors.red)),
@@ -261,14 +259,14 @@ class _DetailPageState extends State<DetailPage> {
             SizedBox(
               height: 100,
             ),
-            RaisedButton(
+            MaterialButton(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(18),
                 side: BorderSide(color: Colors.red),
               ),
               onPressed: () {
                 _sendMessage("STOP");
-                SVProgressHUD.showInfo("Stopping...");
+                SVProgressHUD.showInfo(status: "Stopping...");
                 Navigator.of(context).pop();
               },
               color: Colors.red,
@@ -293,18 +291,16 @@ class _DetailPageState extends State<DetailPage> {
   Future<File> get _makeNewFile async {
     final path = await _localPath;
     String newFileName = dateFormat.format(DateTime.now());
-    return File('$path/$newFileName.wav');
+    return File('$path/$newFileName/noise.wav');
   }
 
-  void _listofFiles() async {
+  void _listOfFiles() async {
     final path = await _localPath;
     var fileList = Directory(path).list();
     files.clear();
     fileList.forEach((element) {
       if (element.path.contains("wav")) {
         files.insert(0, element);
-
-        print("PATH: ${element.path} Size: ${element.statSync().size}");
       }
     });
 
