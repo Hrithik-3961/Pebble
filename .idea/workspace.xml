@@ -5,25 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="44f10190-00b4-4e98-9957-b50daa53e749" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/android/settings_aar.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.flutter-plugins" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.flutter-plugins-dependencies" beforeDir="false" afterPath="$PROJECT_DIR$/.flutter-plugins-dependencies" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.packages" beforeDir="false" afterPath="$PROJECT_DIR$/.packages" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/debug/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/debug/AndroidManifest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/java/com/thatproject/androidesp32btrecordingapp/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/java/com/innov8itTechnologies/pebble/MainActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/profile/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/profile/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Runner/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Info.plist" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/BluetoothDeviceListEntry.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/BluetoothDeviceListEntry.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/detailpage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/detail_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/detail_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/detail_page.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/wav_header.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/wav_header.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
@@ -44,13 +35,14 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="dart.analysis.tool.window.visible" value="false" />
     <property name="io.flutter.reload.alreadyRun" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="flutter.settings" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../BluetoothClassic" />
+    <property name="settings.editor.selected.configurable" value="preferences.updates" />
     <property name="show.migrate.to.gradle.popup" value="false" />
   </component>
   <component name="RunManager">
@@ -71,7 +63,20 @@
       <option name="presentableId" value="Default" />
       <updated>1620909350638</updated>
     </task>
+    <task id="LOCAL-00001" summary="Minor changes">
+      <created>1620928011786</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1620928011786</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="Minor changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Minor changes" />
   </component>
   <component name="WindowStateProjectService">
     <state x="96" y="0" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1620915925920">
@@ -86,10 +91,14 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="93" y="93" width="1095" height="495" key="AVDManager/0.0.1280.680@0.0.1280.680" timestamp="1620926235216" />
-    <state x="243" y="0" key="CommitChangelistDialog2" timestamp="1620909474106">
+    <state x="243" y="0" key="CommitChangelistDialog2" timestamp="1620928011036">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="243" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1620909474106" />
+    <state x="243" y="0" key="CommitChangelistDialog2/0.0.1280.680@0.0.1280.680" timestamp="1620928011036" />
+    <state x="421" y="96" key="FileChooserDialogImpl" timestamp="1620994623663">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="421" y="96" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1620994623663" />
     <state x="519" y="238" key="Github.ShareDialog" timestamp="1620909636573">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
@@ -98,30 +107,34 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="386" y="39" key="Github.UntrackedFilesDialog/0.0.1280.680@0.0.1280.680" timestamp="1620909646065" />
-    <state width="1237" height="324" key="GridCell.Tab.0.bottom" timestamp="1620927969981">
+    <state width="1237" height="487" key="GridCell.Tab.0.bottom" timestamp="1621055893859">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="324" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1620927969981" />
-    <state width="1237" height="324" key="GridCell.Tab.0.center" timestamp="1620927969979">
+    <state width="1237" height="487" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1621055893859" />
+    <state width="1237" height="487" key="GridCell.Tab.0.center" timestamp="1621055893859">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="324" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1620927969979" />
-    <state width="1237" height="324" key="GridCell.Tab.0.left" timestamp="1620927969979">
+    <state width="1237" height="487" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1621055893859" />
+    <state width="1237" height="487" key="GridCell.Tab.0.left" timestamp="1621055893859">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="324" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1620927969979" />
-    <state width="1237" height="324" key="GridCell.Tab.0.right" timestamp="1620927969980">
+    <state width="1237" height="487" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1621055893859" />
+    <state width="1237" height="487" key="GridCell.Tab.0.right" timestamp="1621055893859">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1237" height="324" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1620927969980" />
-    <state x="142" y="0" key="SettingsEditor" timestamp="1620912845401">
+    <state width="1237" height="487" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1621055893859" />
+    <state x="142" y="0" key="SettingsEditor" timestamp="1621090631495">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="142" y="0" key="SettingsEditor/0.0.1280.680@0.0.1280.680" timestamp="1620912845401" />
+    <state x="142" y="0" key="SettingsEditor/0.0.1280.680@0.0.1280.680" timestamp="1621090631495" />
     <state width="254" height="198" key="ShowFilterAction_Filter_Popup" timestamp="1620912392222">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state width="254" height="198" key="ShowFilterAction_Filter_Popup/0.0.1280.680@0.0.1280.680" timestamp="1620912392222" />
+    <state x="233" y="74" key="Vcs.Push.Dialog.v2" timestamp="1620928016601">
+      <screen x="0" y="0" width="1280" height="680" />
+    </state>
+    <state x="233" y="74" key="Vcs.Push.Dialog.v2/0.0.1280.680@0.0.1280.680" timestamp="1620928016601" />
     <state x="100" y="100" width="1080" height="480" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1620909843810">
       <screen x="0" y="0" width="1280" height="680" />
     </state>

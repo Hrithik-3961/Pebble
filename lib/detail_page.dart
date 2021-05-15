@@ -2,16 +2,17 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:pebble/file_entity_list_tile.dart';
-import 'package:pebble/wav_header.dart';
 import 'package:async/async.dart';
-import 'package:fileaudioplayer/fileaudioplayer.dart';
+import 'package:audiofileplayer/audiofileplayer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
-import 'package:flutter_svprogresshud/flutter_svprogresshud.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pebble/file_entity_list_tile.dart';
+import 'package:pebble/wav_header.dart';
 import 'package:slide_popup_dialog/slide_popup_dialog.dart';
+import 'package:super_easy_permissions/super_easy_permissions.dart';
 
 enum RecordState { stopped, recording }
 
@@ -26,12 +27,14 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   BluetoothConnection connection;
+  int timeElapsed = 0;
+
   bool isConnecting = true;
 
   bool get isConnected => connection != null && connection.isConnected;
   bool isDisconnecting = false;
 
-  List<List<int>> chunks = <List<int>>[];
+  List<List<int>> chunks = [];
   int contentLength = 0;
   Uint8List _bytes;
 
@@ -41,7 +44,8 @@ class _DetailPageState extends State<DetailPage> {
 
   List<FileSystemEntity> files = [];
   String selectedFilePath;
-  FileAudioPlayer player = FileAudioPlayer();
+
+  //FileAudioPlayer player = FileAudioPlayer();
 
   @override
   void initState() {
@@ -89,8 +93,8 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   _completeByte() async {
+    EasyLoading.dismiss();
     if (chunks.length == 0 || contentLength == 0) return;
-    SVProgressHUD.dismiss();
     _bytes = Uint8List(contentLength);
     int offset = 0;
     for (final List<int> chunk in chunks) {
@@ -98,17 +102,35 @@ class _DetailPageState extends State<DetailPage> {
       offset += chunk.length;
     }
 
-    final file = await _makeNewFile;
-    var headerList = WavHeader.createWavHeader(contentLength);
-    file.writeAsBytesSync(headerList, mode: FileMode.write);
-    file.writeAsBytesSync(_bytes, mode: FileMode.append);
+    bool granted = await SuperEasyPermissions.isGranted(Permissions.storage);
+    if (granted) {
+      final File file = await _makeNewFile;
+      List<int> headerList = WavHeader.createWavHeader(contentLength);
+      file.writeAsBytesSync(headerList, mode: FileMode.write);
+      file.writeAsBytesSync(_bytes, mode: FileMode.append);
 
-    print(await file.length());
+      EasyLoading.showToast("File saved at ${file.path}");
+      _listOfFiles();
 
-    _listOfFiles();
+      contentLength = 0;
+      chunks.clear();
+    } else {
+      bool result =
+          await SuperEasyPermissions.askPermission(Permissions.storage);
+      if (result) {
+        final File file = await _makeNewFile;
+        List<int> headerList = WavHeader.createWavHeader(contentLength);
+        file.writeAsBytesSync(headerList, mode: FileMode.write);
+        file.writeAsBytesSync(_bytes, mode: FileMode.append);
 
-    contentLength = 0;
-    chunks.clear();
+        EasyLoading.showToast("File saved at ${file.path}");
+        _listOfFiles();
+
+        contentLength = 0;
+        chunks.clear();
+      } else
+        EasyLoading.showToast("Unable to save the file");
+    }
   }
 
   void _onDataReceived(Uint8List data) {
@@ -117,6 +139,8 @@ class _DetailPageState extends State<DetailPage> {
       contentLength += data.length;
       _timer.reset();
     }
+    else
+      EasyLoading.showToast("ERROR IN DATA RECEIVED");
   }
 
   void _sendMessage(String text) async {
@@ -133,8 +157,12 @@ class _DetailPageState extends State<DetailPage> {
         }
         setState(() {});
       } catch (e) {
+        EasyLoading.showToast("ERROR IN SEND MESSAGE");
         setState(() {});
       }
+    }
+    else {
+      EasyLoading.showToast("ERROR IN SEND MESSAGE 2");
     }
   }
 
@@ -153,7 +181,8 @@ class _DetailPageState extends State<DetailPage> {
           child: isConnected
               ? Column(
                   children: <Widget>[
-                    shotButton(),
+                    recordButton(3),
+                    recordButton(23),
                     Expanded(
                       child: ListView(
                         children: files
@@ -169,15 +198,18 @@ class _DetailPageState extends State<DetailPage> {
                                     }
                                   },
                                   onTap: () async {
+                                    Audio audio = Audio.load(_file.path);
                                     if (_file.path == selectedFilePath) {
-                                      await player.stop();
+                                      //await player.stop();
+                                      audio.dispose();
                                       selectedFilePath = '';
                                       return;
                                     }
 
                                     if (await File(_file.path).exists()) {
                                       selectedFilePath = _file.path;
-                                      await player.start(_file.path);
+                                      //await player.start(_file.path);
+                                      audio.play();
                                     } else {
                                       selectedFilePath = '';
                                     }
@@ -202,7 +234,7 @@ class _DetailPageState extends State<DetailPage> {
         ));
   }
 
-  Widget shotButton() {
+  Widget recordButton(int seconds) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: MaterialButton(
@@ -212,7 +244,7 @@ class _DetailPageState extends State<DetailPage> {
         onPressed: () {
           if (_recordState == RecordState.stopped) {
             _sendMessage("START");
-            _showRecordingDialog();
+            _showRecordingDialog(seconds);
           } else {
             _sendMessage("STOP");
           }
@@ -222,7 +254,9 @@ class _DetailPageState extends State<DetailPage> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
-            _recordState == RecordState.stopped ? "RECORD" : "STOP",
+            _recordState == RecordState.stopped
+                ? "RECORD FOR $seconds seconds"
+                : "STOP",
             style: TextStyle(fontSize: 24),
           ),
         ),
@@ -230,7 +264,20 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  void _showRecordingDialog() {
+  void _showRecordingDialog(int seconds) {
+    print("START TIME: ${DateTime.now().minute}, ${DateTime.now().second}");
+    for (int i = 0; i < seconds; i++) {
+      Future.delayed(Duration(seconds: 1), () {
+        setState(() => timeElapsed++);
+      });
+    }
+    Future.delayed(Duration(seconds: seconds), () {
+      EasyLoading.show(
+          status: "Stopping...", maskType: EasyLoadingMaskType.black);
+      _sendMessage("STOP");
+      Navigator.of(context).pop();
+    });
+
     showSlideDialog(
         barrierDismissible: false,
         context: context,
@@ -246,8 +293,10 @@ class _DetailPageState extends State<DetailPage> {
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
             SizedBox(
-              height: 100,
+              height: 20,
             ),
+            Text("Time Elapsed: $timeElapsed seconds"),
+            SizedBox(height: 100),
             Container(
               width: 100,
               height: 100,
@@ -259,39 +308,19 @@ class _DetailPageState extends State<DetailPage> {
             SizedBox(
               height: 100,
             ),
-            MaterialButton(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
-                side: BorderSide(color: Colors.red),
-              ),
-              onPressed: () {
-                _sendMessage("STOP");
-                SVProgressHUD.showInfo(status: "Stopping...");
-                Navigator.of(context).pop();
-              },
-              color: Colors.red,
-              textColor: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Text(
-                  "STOP",
-                  style: TextStyle(fontSize: 24),
-                ),
-              ),
-            )
           ],
         ));
   }
 
   Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
+    final directory = await getExternalStorageDirectory();
     return directory.path;
   }
 
   Future<File> get _makeNewFile async {
     final path = await _localPath;
     String newFileName = dateFormat.format(DateTime.now());
-    return File('$path/$newFileName/noise.wav');
+    return File('$path/Pebble/$newFileName/noise.wav');
   }
 
   void _listOfFiles() async {
@@ -303,7 +332,6 @@ class _DetailPageState extends State<DetailPage> {
         files.insert(0, element);
       }
     });
-
     setState(() {});
   }
 }

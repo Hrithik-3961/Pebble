@@ -1,3 +1,4 @@
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:pebble/BluetoothDeviceListEntry.dart';
 import 'package:pebble/detail_page.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: HomePage(),
       debugShowCheckedModeBanner: false,
+      builder: EasyLoading.init(),
     );
   }
 }
@@ -71,7 +73,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       } else {
         devices.clear();
       }
-      print("State isEnabled: ${state.isEnabled}");
       setState(() {});
     });
   }
@@ -111,7 +112,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               subtitle: Text(_bluetoothState.toString(),
               style: TextStyle(
                 fontSize: MediaQuery.of(context).size.width * 0.04
-              ),),
+              ),
+              ),
               trailing: MaterialButton(
                 child: Text("Settings"),
                 onPressed: () {
@@ -127,7 +129,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                           device: _device,
                           enabled: true,
                           onTap: () {
-                            print("Item");
                             _startCBluetoothConnect(context, _device);
                           },
                         ))
