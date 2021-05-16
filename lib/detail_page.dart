@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:async/async.dart';
 import 'package:audiofileplayer/audiofileplayer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -26,12 +26,15 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
-  BluetoothConnection connection;
+  //BluetoothConnection connection;
+  List<BluetoothService> services;
+  List<BluetoothCharacteristic> characteristics;
+
   int timeElapsed = 0;
 
   bool isConnecting = true;
 
-  bool get isConnected => connection != null && connection.isConnected;
+  bool get isConnected => services != null;
   bool isDisconnecting = false;
 
   List<List<int>> chunks = [];
@@ -60,17 +63,44 @@ class _DetailPageState extends State<DetailPage> {
   void dispose() {
     if (isConnected) {
       isDisconnecting = true;
-      connection.dispose();
-      connection = null;
+      //connection.dispose();
+      //connection = null;
     }
     _timer.cancel();
     super.dispose();
   }
 
-  _getBTConnection() {
-    print('MAC ADDRESS: ${widget.server.address}');
+  _getBTConnection() async {
+    print('MAC ADDRESS: ${widget.server}');
 
-    BluetoothConnection.toAddress(widget.server.address).then((_connection) {
+    await widget.server.connect(autoConnect: false).catchError((error) {
+      print("ERROR: $error");
+    });
+    widget.server.connect(autoConnect: false).then((_connection) async {
+      print("debug");
+      services = await widget.server.discoverServices();
+      print("debug 2");
+      isConnecting = false;
+      isDisconnecting = false;
+      setState(() {});
+      services.forEach((service) {
+        characteristics = service.characteristics;
+        characteristics.forEach((characteristic) {
+          characteristic.value.listen(_onDataReceived).onDone(() {
+            if (this.mounted) {
+              setState(() {});
+            }
+            Navigator.of(context).pop();
+          });
+        });
+      });
+    }).catchError((error) {
+      print("myERROR: $error");
+      Navigator.of(context).pop();
+    });
+
+    print("skipped");
+    /*BluetoothConnection.toAddress(widget.server.address).then((_connection) {
       connection = _connection;
       isConnecting = false;
       isDisconnecting = false;
@@ -89,12 +119,14 @@ class _DetailPageState extends State<DetailPage> {
     }).catchError((error) {
       print("myERROR: $error");
       Navigator.of(context).pop();
-    });
+    });*/
   }
 
   _completeByte() async {
-    EasyLoading.dismiss();
-    if (chunks.length == 0 || contentLength == 0) return;
+    if (chunks.length == 0 || contentLength == 0) {
+      EasyLoading.dismiss();
+      return;
+    }
     _bytes = Uint8List(contentLength);
     int offset = 0;
     for (final List<int> chunk in chunks) {
@@ -131,6 +163,7 @@ class _DetailPageState extends State<DetailPage> {
       } else
         EasyLoading.showToast("Unable to save the file");
     }
+    EasyLoading.dismiss();
   }
 
   void _onDataReceived(Uint8List data) {
@@ -138,8 +171,7 @@ class _DetailPageState extends State<DetailPage> {
       chunks.add(data);
       contentLength += data.length;
       _timer.reset();
-    }
-    else
+    } else
       EasyLoading.showToast("ERROR IN DATA RECEIVED");
   }
 
@@ -147,8 +179,11 @@ class _DetailPageState extends State<DetailPage> {
     text = text.trim();
     if (text.length > 0) {
       try {
-        connection.output.add(utf8.encode(text));
-        await connection.output.allSent;
+        characteristics.forEach((characteristic) {
+          characteristic.write(utf8.encode(text));
+        });
+        /*connection.output.add(utf8.encode(text));
+        await connection.output.allSent;*/
 
         if (text == "START") {
           _recordState = RecordState.recording;
@@ -160,8 +195,7 @@ class _DetailPageState extends State<DetailPage> {
         EasyLoading.showToast("ERROR IN SEND MESSAGE");
         setState(() {});
       }
-    }
-    else {
+    } else {
       EasyLoading.showToast("ERROR IN SEND MESSAGE 2");
     }
   }
@@ -242,12 +276,14 @@ class _DetailPageState extends State<DetailPage> {
             borderRadius: BorderRadius.circular(18),
             side: BorderSide(color: Colors.red)),
         onPressed: () {
-          if (_recordState == RecordState.stopped) {
-            _sendMessage("START");
-            _showRecordingDialog(seconds);
-          } else {
-            _sendMessage("STOP");
-          }
+          setState(() {
+            if (_recordState == RecordState.stopped) {
+              _sendMessage("START");
+              _showRecordingDialog(seconds);
+            } else {
+              _sendMessage("STOP");
+            }
+          });
         },
         color: Colors.red,
         textColor: Colors.white,
@@ -266,11 +302,11 @@ class _DetailPageState extends State<DetailPage> {
 
   void _showRecordingDialog(int seconds) {
     print("START TIME: ${DateTime.now().minute}, ${DateTime.now().second}");
-    for (int i = 0; i < seconds; i++) {
+    /*for (int i = 0; i < seconds; i++) {
       Future.delayed(Duration(seconds: 1), () {
         setState(() => timeElapsed++);
       });
-    }
+    }*/
     Future.delayed(Duration(seconds: seconds), () {
       EasyLoading.show(
           status: "Stopping...", maskType: EasyLoadingMaskType.black);

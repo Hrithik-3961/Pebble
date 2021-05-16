@@ -1,8 +1,8 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:pebble/BluetoothDeviceListEntry.dart';
 import 'package:pebble/detail_page.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
 void main() {
   runApp(MyApp());
@@ -25,7 +25,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
-  BluetoothState _bluetoothState = BluetoothState.UNKNOWN;
+  BluetoothState _bluetoothState = BluetoothState.unknown;
+  FlutterBlue _flutterBlue = FlutterBlue.instance;
 
   List<BluetoothDevice> devices = [];
 
@@ -33,7 +34,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _getBTState();
+    //_getBTState();
     _stateChangeListener();
   }
 
@@ -44,16 +45,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state.index == 0) {
       //resume
-      if (_bluetoothState.isEnabled) {
+      if (await _flutterBlue.isOn) {
         _listBondedDevices();
       }
     }
   }
 
-  _getBTState() {
+  /*_getBTState() {
     FlutterBluetoothSerial.instance.state.then((state) {
       _bluetoothState = state;
       if (_bluetoothState.isEnabled) {
@@ -61,10 +62,19 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       }
       setState(() {});
     });
-  }
+  }*/
 
   _stateChangeListener() {
-    FlutterBluetoothSerial.instance
+    _flutterBlue.state.listen((state) async {
+      _bluetoothState = state;
+      if (await _flutterBlue.isOn) {
+        _listBondedDevices();
+      } else {
+        devices.clear();
+      }
+      setState(() {});
+    });
+    /*FlutterBluetoothSerial.instance
         .onStateChanged()
         .listen((BluetoothState state) {
       _bluetoothState = state;
@@ -74,16 +84,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         devices.clear();
       }
       setState(() {});
-    });
+    });*/
   }
 
   _listBondedDevices() {
-    FlutterBluetoothSerial.instance
+    _flutterBlue.startScan();
+    _flutterBlue.scanResults.listen((results) {
+      for (ScanResult r in results) devices.add(r.device);
+      setState(() {});
+    });
+    /*FlutterBluetoothSerial.instance
         .getBondedDevices()
         .then((List<BluetoothDevice> bondedDevices) {
       devices = bondedDevices;
       setState(() {});
-    });
+    });*/
   }
 
   @override
@@ -95,29 +110,34 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       body: Container(
         child: Column(
           children: <Widget>[
-            SwitchListTile(
-              title: Text('Enable Bluetooth'),
-              value: _bluetoothState.isEnabled,
-              onChanged: (bool value) async {
-                if (value) {
-                  await FlutterBluetoothSerial.instance.requestEnable();
-                } else {
-                  await FlutterBluetoothSerial.instance.requestDisable();
-                }
-                setState(() {});
+            FutureBuilder(
+              future: _flutterBlue.isOn,
+              builder: (context, value) {
+                return SwitchListTile(
+                  title: Text('Enable Bluetooth'),
+                  value: value.data,
+                  onChanged: (bool value) async {
+                    /*if (value) {
+                      await FlutterBluetoothSerial.instance.requestEnable();
+                    } else {
+                      await FlutterBluetoothSerial.instance.requestDisable();
+                    }*/
+                    setState(() {});
+                  },
+                );
               },
             ),
             ListTile(
               title: Text("Bluetooth STATUS"),
-              subtitle: Text(_bluetoothState.toString(),
-              style: TextStyle(
-                fontSize: MediaQuery.of(context).size.width * 0.04
-              ),
+              subtitle: Text(
+                _bluetoothState.toString(),
+                style: TextStyle(
+                    fontSize: MediaQuery.of(context).size.width * 0.04),
               ),
               trailing: MaterialButton(
                 child: Text("Settings"),
                 onPressed: () {
-                  FlutterBluetoothSerial.instance.openSettings();
+                  //FlutterBluetoothSerial.instance.openSettings();
                 },
               ),
             ),
@@ -125,13 +145,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               child: ListView(
                 children: devices
                     .map((_device) => BluetoothDeviceListEntry(
-                          context: context,
-                          device: _device,
-                          enabled: true,
-                          onTap: () {
-                            _startCBluetoothConnect(context, _device);
-                          },
-                        ))
+                  context: context,
+                  device: _device,
+                  enabled: true,
+                  onTap: () {
+                    _startCBluetoothConnect(context, _device);
+                  },
+                ))
                     .toList(),
               ),
             )
@@ -142,6 +162,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   void _startCBluetoothConnect(BuildContext context, BluetoothDevice server) {
+    _flutterBlue.stopScan();
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
       return DetailPage(server: server);
     }));

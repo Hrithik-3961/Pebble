@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 
 class BluetoothDeviceListEntry extends ListTile {
   BluetoothDeviceListEntry({
@@ -8,17 +8,18 @@ class BluetoothDeviceListEntry extends ListTile {
     GestureTapCallback onTap,
     GestureLongPressCallback onLongPress,
     bool enabled = true,
-    BuildContext context
+    BuildContext context,
   }) : super(
           onTap: onTap,
           onLongPress: onLongPress,
           enabled: enabled,
           leading: Icon(Icons.devices),
           title: Text(device.name ?? "Unknown device"),
-          subtitle: Text(device.address.toString(),
-            style: TextStyle(
-              fontSize: MediaQuery.of(context).size.width * 0.04
-            ),),
+    subtitle: Text(
+            device.id.toString(),
+            style:
+                TextStyle(fontSize: MediaQuery.of(context).size.width * 0.04),
+          ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -37,15 +38,17 @@ class BluetoothDeviceListEntry extends ListTile {
                       ),
                     )
                   : Container(width: 0, height: 0),
-              device.isConnected
+              /*device.isConnected
                   ? Icon(Icons.import_export)
                   : Container(width: 0, height: 0),
               device.isBonded
                   ? Icon(Icons.link)
-                  : Container(width: 0, height: 0),
+                  : Container(width: 0, height: 0),*/
             ],
           ),
-        );
+        ) {
+    device.state.listen((state) {});
+  }
 
   static TextStyle _computeTextStyle(int rssi) {
     /**/ if (rssi >= -35)
